@@ -7,7 +7,7 @@ CWD="${BASH_SOURCE%/*}"
 DEPENDS_ON=(~/bin/dependency-1.sh \
         ~/bin/dependency-2.sh)
 
-# Define script entry point
+# Define script entry point (main)
 # Run in subshell so that all changes to environment are transient
 __main () (
 	# Declare all global variables
@@ -15,36 +15,42 @@ __main () (
 	g_variable_1="..."
 
 	# Load dependencies
+	# Subshell scopting prevents these contaminating environment of parent shell
         for FILE in "${DEPENDS_ON[@]}"; do source "${CWD}/${FILE}"; done
 
 	# Do stuff ...
 	__func_1
 
-	# exit properly
+	# Report success status back to parent shell
 	exit 0
 )
 
-# Forward declcare all functions
+# Forward declcaration of all functions
+
 # Public functions (to be exported)
 public_func () {
 }
 
-# Private functions should begin __
+# Private functions, should begin __
 __func_1 () {
 	# Declare local variables
 	# Note, local scopes to current and all called functions
 	local variable_1="..."
 }
 
-# Call the entry point, passing through all positional parameters
+# Call the entry point after all other functions have been forward declared
+# Pass through all positional parameters
 __main "$@"
 
-# Export and protect all public functions
+# Export and protect all public functions from being redeclared
 export -f public_func && readonly -f public_func
 
-# Remove all environmental side affects
+# Remove all environmental side effects
+
+# Global variables
 unset CWD
 unset DEPENDS_ON
 
+## Private functions
 unset -f __main
 unset -f __func_1
