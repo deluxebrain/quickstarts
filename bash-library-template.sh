@@ -1,56 +1,35 @@
 #!/bin/bash
+#
+# Template for Bash library file to provide cohesive collection of Bash functions;
+# 1. File should be sourced from calling script to ensure that the functions are added
+# 	to the corresponding environment;
+# 2. File should not have any dependencies of its own; any additional custom functions
+# 	required for the correct operation of this file should be sourced by the calling
+#	script;
+#
 
-# Get path of currently executing script
-CWD="${BASH_SOURCE%/*}" 
+# Export environment variables
+export ENV_VAR="..."
 
-# Configure our dependencies
-DEPENDS_ON=(~/bin/dependency-1.sh \
-        ~/bin/dependency-2.sh)
+# Private functions, should begin __
+__func_1 () {
+        # Declare local variables
+        # Note, local scopes to current and all called functions
+        local variable_1="..."
 
-# Define script entry point (main)
-# Run in subshell so that all changes to environment are transient
-__main () (
-	# Declare all global variables
-	# Subshell scoping prevents these contaminating environment of parent shell
-	g_variable_1="..."
+	# Write out any required information to stdout
+	echo "..." >
 
-	# Load dependencies
-	# Subshell scopting prevents these contaminating environment of parent shell
-        for FILE in "${DEPENDS_ON[@]}"; do source "${CWD}/${FILE}"; done
-
-	# Do stuff ...
-	__func_1
-
-	# Report success status back to parent shell
-	exit 0
-)
-
-# Forward declcaration of all functions
+	# Return status code
+	return 0 # or 1 for error
+}
 
 # Public functions (to be exported)
 public_func () {
 }
 
-# Private functions, should begin __
-__func_1 () {
-	# Declare local variables
-	# Note, local scopes to current and all called functions
-	local variable_1="..."
-}
-
-# Call the entry point after all other functions have been forward declared
-# Pass through all positional parameters
-__main "$@"
-
 # Export and protect all public functions from being redeclared
 export -f public_func && readonly -f public_func
 
 # Remove all environmental side effects
-
-# Global variables
-unset CWD
-unset DEPENDS_ON
-
-## Private functions
-unset -f __main
 unset -f __func_1
